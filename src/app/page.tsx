@@ -32,6 +32,10 @@ const model = new ChatOpenAI({
 export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [response, setResponse] = useState("");
+  const [conversationHistory, setConversationHistory] = useState<string[]>([
+    "",
+    "",
+  ]);
 
   useEffect(() => {
     const run = async () => {};
@@ -49,13 +53,24 @@ export default function Home() {
     console.log("res", res);
   };
 
+  const getFormattedConversationHistory = (): string => {
+    return conversationHistory.length === 0
+      ? ""
+      : conversationHistory
+          .map((message, index) => {
+            return `${index % 2 === 0 ? "Human" : "AI"}: ${message}`;
+          })
+          .join("\n");
+  };
+
   const handleSubmit = async () => {
-    await storeVectors();
+    // await storeVectors();
 
     // const template = `Who is the prime minister or president of {country}?`;
     // const prompt = PromptTemplate.fromTemplate(template);
     const prompt = PromptTemplate.fromTemplate(`
-      Answer the question based only on the following context: {context}
+      Answer the question based only on the following context and conversation history.
+      Context: {context}
       Question: {question}
     `);
     // const prompt = PromptTemplate.fromTemplate(userInput);
@@ -73,8 +88,9 @@ export default function Home() {
       model,
       new StringOutputParser(),
     ]);
-    const chatRes = await chain.invoke(userInput);
-    setResponse(chatRes);
+    const res = await chain.invoke(userInput);
+    setConversationHistory((prev) => [...prev, userInput, res]);
+    setResponse(res);
   };
 
   return (
