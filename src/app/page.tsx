@@ -3,7 +3,7 @@
 import createClient from "@/lib/supabase/client";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { PromptTemplate } from "langchain/prompts";
-import { RunnablePassthrough, RunnableSequence } from "langchain/runnables";
+import { RunnableSequence } from "langchain/runnables";
 import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
@@ -69,7 +69,7 @@ export default function Home() {
     // const template = `Who is the prime minister or president of {country}?`;
     // const prompt = PromptTemplate.fromTemplate(template);
     const prompt = PromptTemplate.fromTemplate(`
-      Answer the question based only on the following context and conversation history.
+      Answer the question based only on the following context.
       Context: {context}
       Question: {question}
     `);
@@ -79,16 +79,27 @@ export default function Home() {
     // };
     // const chain = prompt.pipe(chatModel).pipe(outputParser).pipe(retriever).pipe(combineDocuments);
 
-    const chain = RunnableSequence.from([
-      {
-        context: retriever.pipe(formatDocumentsAsString),
-        question: new RunnablePassthrough(),
-      },
-      prompt,
-      model,
-      new StringOutputParser(),
+    const retrieverChain = RunnableSequence.from([
+      (prevResult) => prevResult.question,
+      retriever,
+      formatDocumentsAsString,
     ]);
-    const res = await chain.invoke(userInput);
+    const answerChain = prompt.pipe(model).pipe(new StringOutputParser());
+
+    const chain = RunnableSequence.from([
+      // {
+      //   original_input: new RunnablePassthrough(),
+      // },
+      {
+        context: retrieverChain,
+        question: (input) => input.question,
+      },
+      answerChain,
+    ]);
+    const res = await chain.invoke({
+      // conversation_history: getFormattedConversationHistory(),
+      question: userInput,
+    });
     setConversationHistory((prev) => [...prev, userInput, res]);
     setResponse(res);
   };
