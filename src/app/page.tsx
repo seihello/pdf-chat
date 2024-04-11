@@ -2,7 +2,7 @@
 
 import createClient from "@/lib/supabase/client";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
-import { PromptTemplate } from "langchain/prompts";
+import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
 import { RunnableSequence } from "langchain/runnables";
 import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 // const blob = new Blob(); // e.g. from a file input
 // const loader = new WebPDFLoader(blob);
 // const outputParser = new StringOutputParser();
+import { AIMessage, HumanMessage } from "langchain/schema";
 
 const supabase = createClient();
 const embeddings = new OpenAIEmbeddings({
@@ -32,10 +33,9 @@ const model = new ChatOpenAI({
 export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [response, setResponse] = useState("");
-  const [conversationHistory, setConversationHistory] = useState<string[]>([
-    "",
-    "",
-  ]);
+  const [conversationHistory, setConversationHistory] = useState<
+    (HumanMessage | AIMessage)[]
+  >([]);
 
   useEffect(() => {
     const run = async () => {};
@@ -54,6 +54,8 @@ export default function Home() {
   };
 
   const getFormattedConversationHistory = (): string => {
+    console.log("conversationHistory", conversationHistory);
+
     return conversationHistory.length === 0
       ? ""
       : conversationHistory
@@ -68,11 +70,20 @@ export default function Home() {
 
     // const template = `Who is the prime minister or president of {country}?`;
     // const prompt = PromptTemplate.fromTemplate(template);
-    const prompt = PromptTemplate.fromTemplate(`
-      Answer the question based only on the following context.
-      Context: {context}
-      Question: {question}
-    `);
+    //   const prompt = PromptTemplate.fromTemplate(`
+    //   Answer the question based only on the following context and conversation history.
+    //   Context: {context}
+    //   Conversation history: {conversation_history}
+    //   Question: {question}
+    // `);
+    const prompt = ChatPromptTemplate.fromMessages([
+      [
+        "system",
+        `Answer the question based only on the following context: {context}`,
+      ],
+      new MessagesPlaceholder("conversation_history"),
+      ["user", "{question}"],
+    ]);
     // const prompt = PromptTemplate.fromTemplate(userInput);
     // const combineDocuments = (docs: any) => {
     //   return docs.map((doc: any) => doc.pageContent).join("\n\n");
@@ -87,20 +98,26 @@ export default function Home() {
     const answerChain = prompt.pipe(model).pipe(new StringOutputParser());
 
     const chain = RunnableSequence.from([
-      // {
-      //   original_input: new RunnablePassthrough(),
-      // },
       {
         context: retrieverChain,
         question: (input) => input.question,
+        conversation_history: (input) => input.conversation_history,
       },
       answerChain,
     ]);
+    console.log(
+      "getFormattedConversationHistory",
+      getFormattedConversationHistory(),
+    );
     const res = await chain.invoke({
-      // conversation_history: getFormattedConversationHistory(),
+      conversation_history: conversationHistory,
       question: userInput,
     });
-    setConversationHistory((prev) => [...prev, userInput, res]);
+    setConversationHistory((prev) => [
+      ...prev,
+      new HumanMessage(userInput),
+      new AIMessage(res),
+    ]);
     setResponse(res);
   };
 
