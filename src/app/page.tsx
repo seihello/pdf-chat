@@ -4,16 +4,11 @@ import createClient from "@/lib/supabase/client";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
 import { RunnableSequence } from "langchain/runnables";
+import { AIMessage, HumanMessage } from "langchain/schema";
 import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
 import { useEffect, useState } from "react";
-// Or, in web environments:
-// import { WebPDFLoader } from "langchain/document_loaders/web/pdf";
-// const blob = new Blob(); // e.g. from a file input
-// const loader = new WebPDFLoader(blob);
-// const outputParser = new StringOutputParser();
-import { AIMessage, HumanMessage } from "langchain/schema";
 
 const supabase = createClient();
 const embeddings = new OpenAIEmbeddings({
@@ -53,29 +48,9 @@ export default function Home() {
     console.log("res", res);
   };
 
-  const getFormattedConversationHistory = (): string => {
-    console.log("conversationHistory", conversationHistory);
-
-    return conversationHistory.length === 0
-      ? ""
-      : conversationHistory
-          .map((message, index) => {
-            return `${index % 2 === 0 ? "Human" : "AI"}: ${message}`;
-          })
-          .join("\n");
-  };
-
   const handleSubmit = async () => {
     // await storeVectors();
 
-    // const template = `Who is the prime minister or president of {country}?`;
-    // const prompt = PromptTemplate.fromTemplate(template);
-    //   const prompt = PromptTemplate.fromTemplate(`
-    //   Answer the question based only on the following context and conversation history.
-    //   Context: {context}
-    //   Conversation history: {conversation_history}
-    //   Question: {question}
-    // `);
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
@@ -84,12 +59,6 @@ export default function Home() {
       new MessagesPlaceholder("conversation_history"),
       ["user", "{question}"],
     ]);
-    // const prompt = PromptTemplate.fromTemplate(userInput);
-    // const combineDocuments = (docs: any) => {
-    //   return docs.map((doc: any) => doc.pageContent).join("\n\n");
-    // };
-    // const chain = prompt.pipe(chatModel).pipe(outputParser).pipe(retriever).pipe(combineDocuments);
-
     const retrieverChain = RunnableSequence.from([
       (prevResult) => prevResult.question,
       retriever,
@@ -105,10 +74,6 @@ export default function Home() {
       },
       answerChain,
     ]);
-    console.log(
-      "getFormattedConversationHistory",
-      getFormattedConversationHistory(),
-    );
     const res = await chain.invoke({
       conversation_history: conversationHistory,
       question: userInput,
