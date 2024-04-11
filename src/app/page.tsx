@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import createClient from "@/lib/supabase/client";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
@@ -92,21 +92,9 @@ export default function Home() {
   console.log("conversationHistory", conversationHistory);
 
   return (
-    <main className="flex flex-col items-center gap-y-4 p-24">
+    <main className="relative flex flex-col items-center gap-y-4 p-24">
       <h1 className="text-primary text-2xl font-bold">Talk to AI with PDF</h1>
-      <Textarea
-        className="h-32 w-[500px] border bg-white p-2"
-        onChange={(e) => setUserInput(e.target.value)}
-      />
-      <Button
-        onClick={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-        className="rounded-lg px-4 py-2 text-white"
-      >
-        Submit
-      </Button>
+
       <div className="flex w-full flex-col gap-y-4">
         {conversationHistory.map(
           (conversation: HumanMessage | AIMessage, index: number) => (
@@ -122,6 +110,22 @@ export default function Home() {
             </div>
           ),
         )}
+      </div>
+
+      <div className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black py-2">
+        <Input
+          className="flex-1 border bg-white p-2"
+          onChange={(e) => setUserInput(e.target.value)}
+        />
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="rounded-lg px-4 py-2 text-white"
+        >
+          Submit
+        </Button>
       </div>
     </main>
   );
