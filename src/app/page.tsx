@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import createClient from "@/lib/supabase/client";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
@@ -17,6 +19,7 @@ const embeddings = new OpenAIEmbeddings({
 const vectorStore = new SupabaseVectorStore(embeddings, {
   client: supabase,
   tableName: "documents",
+  // filter: { source: "public/Seisuke_Yamada_Resume.pdf" },
   queryName: "match_documents",
 });
 const retriever = vectorStore.asRetriever();
@@ -86,22 +89,40 @@ export default function Home() {
     setResponse(res);
   };
 
+  console.log("conversationHistory", conversationHistory);
+
   return (
-    <main className="flex min-h-screen flex-col items-center gap-y-4 p-24">
-      <textarea
-        className="h-32 w-[500px] border p-2"
+    <main className="flex flex-col items-center gap-y-4 p-24">
+      <h1 className="text-primary text-2xl font-bold">Talk to AI with PDF</h1>
+      <Textarea
+        className="h-32 w-[500px] border bg-white p-2"
         onChange={(e) => setUserInput(e.target.value)}
       />
-      <button
+      <Button
         onClick={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="rounded-lg bg-sky-500 px-4 py-2 text-white"
+        className="rounded-lg px-4 py-2 text-white"
       >
         Submit
-      </button>
-      <div className="mt-8 text-gray-500">{response}</div>
+      </Button>
+      <div className="flex w-full flex-col gap-y-4">
+        {conversationHistory.map(
+          (conversation: HumanMessage | AIMessage, index: number) => (
+            <div
+              key={index}
+              className={`flex ${index % 2 === 0 ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`mr-0 rounded-lg px-4 py-2 ${index % 2 === 0 ? "bg-primary text-white" : "bg-gray-200 text-gray-900"}`}
+              >
+                {conversation.content.toString()}
+              </div>
+            </div>
+          ),
+        )}
+      </div>
     </main>
   );
 }
