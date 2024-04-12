@@ -11,9 +11,8 @@ import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
 
 export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
-  const { fileUrl } = await req.json();
-  console.log("fileUrl", fileUrl);
-  const response = await fetch(fileUrl);
+  const { session_id, file_url } = await req.json();
+  const response = await fetch(file_url);
   const blob = await response.blob();
 
   // Request the OpenAI API for the response based on the prompt
@@ -23,11 +22,14 @@ export async function POST(req: Request) {
 
   const docs = await loader.load();
   const textSplitter = new CharacterTextSplitter({
-    // chunkSize: 1000,
-    // chunkOverlap: 200,
+    chunkSize: 1000,
+    chunkOverlap: 200,
+  });
+  const docsWithMetadata = docs.map((doc) => {
+    return { ...doc, metadata: { ...doc.metadata, session_id: session_id } };
   });
 
-  const splitDocs = await textSplitter.splitDocuments(docs);
+  const splitDocs = await textSplitter.splitDocuments(docsWithMetadata);
   console.log({ splitDocs });
 
   const supabase = await createClient();

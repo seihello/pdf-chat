@@ -33,29 +33,33 @@ export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [vectorStore, setVectorStore] = useState<SupabaseVectorStore>();
   const [isPreparingVectors, setIsPreparingVectors] = useState(false);
+  // const [sessionId, setSessionId] = useState<string>();
 
-  const storeVectors = async (fileUrl: string) => {
+  const storeVectors = async (sessionId: string, fileUrl: string) => {
     const res = await fetch(`/api/store-vector`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        fileUrl: fileUrl,
+        session_id: sessionId,
+        file_url: fileUrl,
       }),
     });
-    console.log("res", res);
+    console.log("storeVectors Response", res);
   };
 
   const handleFileSubmit = async () => {
     if (files.length > 0) {
       setIsPreparingVectors(true);
-      const fileUrl = await uploadFile(uuidv4(), files[0]);
-      await storeVectors(fileUrl);
+      const sessionId = uuidv4();
+      // setSessionId(sessionId);
+      const fileUrl = await uploadFile(sessionId, files[0]);
+      await storeVectors(sessionId, fileUrl);
       const vectorStore = new SupabaseVectorStore(embeddings, {
         client: supabase,
         tableName: "documents",
-        // filter: { source: fileUrl },
+        filter: { session_id: sessionId },
         queryName: "match_documents",
       });
       setVectorStore(vectorStore);
