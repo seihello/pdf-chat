@@ -26,14 +26,13 @@ const model = new ChatOpenAI({
 
 export default function Home() {
   const [userInput, setUserInput] = useState("");
-  const [response, setResponse] = useState("");
   const [conversationHistory, setConversationHistory] = useState<
     (HumanMessage | AIMessage)[]
   >([]);
   const [files, setFiles] = useState<File[]>([]);
   const [vectorStore, setVectorStore] = useState<SupabaseVectorStore>();
   const [isPreparingVectors, setIsPreparingVectors] = useState(false);
-  // const [sessionId, setSessionId] = useState<string>();
+  const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
 
   const storeVectors = async (sessionId: string, fileUrl: string) => {
     const res = await fetch(`/api/store-vector`, {
@@ -53,7 +52,6 @@ export default function Home() {
     if (files.length > 0) {
       setIsPreparingVectors(true);
       const sessionId = uuidv4();
-      // setSessionId(sessionId);
       const fileUrl = await uploadFile(sessionId, files[0]);
       await storeVectors(sessionId, fileUrl);
       const vectorStore = new SupabaseVectorStore(embeddings, {
@@ -69,6 +67,8 @@ export default function Home() {
 
   const handleSubmit = async () => {
     if (!vectorStore) return;
+
+    setIsGeneratingResponse(true);
 
     setConversationHistory((prev) => [...prev, new HumanMessage(userInput)]);
     setUserInput("");
@@ -102,10 +102,9 @@ export default function Home() {
       question: userInput,
     });
     setConversationHistory((prev) => [...prev, new AIMessage(res)]);
-    setResponse(res);
-  };
 
-  console.log("conversationHistory", conversationHistory);
+    setIsGeneratingResponse(false);
+  };
 
   return (
     <div className="relative flex flex-col items-center gap-y-8 p-24">
@@ -162,8 +161,15 @@ export default function Home() {
           onChange={(e) => setUserInput(e.target.value)}
           value={userInput}
         />
-        <Button type="submit" className="rounded-lg px-4 py-2 text-white">
-          Submit
+        <Button
+          type="submit"
+          className="flex items-center gap-x-1 rounded-lg px-4 py-2 text-white"
+          disabled={isGeneratingResponse}
+        >
+          {isGeneratingResponse && (
+            <span className="loading loading-spinner loading-xs opacity-75" />
+          )}
+          <span>Send</span>
         </Button>
       </form>
     </div>
