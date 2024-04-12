@@ -73,7 +73,7 @@ export default function Home() {
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
-        `Answer the question based only on the following context: {context}`,
+        `Answer the question based ONLY on the following context: {context}. Even if you can't find the answer in this context, don't search external information. Just say "I'm sorry. I can't find the information."`,
       ],
       new MessagesPlaceholder("conversation_history"),
       ["user", "{question}"],
@@ -110,7 +110,7 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col items-center gap-y-8 p-24">
-      <h1 className="border-primary rounded-sm border-4 px-8 py-4 text-2xl font-bold text-white">
+      <h1 className="rounded-sm border-4 border-primary px-8 py-4 text-2xl font-bold text-white">
         Talk to AI with PDF
       </h1>
       <div className="flex w-full flex-col gap-y-4">
@@ -123,8 +123,12 @@ export default function Home() {
                 handleFileSubmit();
               }}
               disabled={isPreparingVectors}
+              className="flex items-center gap-x-1"
             >
-              OK
+              {isPreparingVectors && (
+                <span className="loading loading-spinner loading-xs opacity-75" />
+              )}
+              <span>OK</span>
             </Button>
           </div>
         )}

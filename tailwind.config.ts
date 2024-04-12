@@ -71,6 +71,10 @@ const config: Config = {
     // require("tailwindcss-animate"),
     require("autoprefixer"),
     // require("tailwindcss-text-fill"),
+    require("daisyui"),
   ],
+  daisyui: {
+    base: false,
+  },
 };
 export default config;
