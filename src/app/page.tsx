@@ -147,6 +147,13 @@ export default function Home() {
             </div>
           ),
         )}
+        {isGeneratingResponse && (
+          <div className="flex justify-start">
+            <div className="mr-0 flex items-center rounded-lg bg-gray-200 px-4 py-2 text-gray-900">
+              <span className="loading loading-dots loading-md opacity-50" />
+            </div>
+          </div>
+        )}
       </div>
 
       <form
@@ -166,10 +173,7 @@ export default function Home() {
           className="flex items-center gap-x-1 rounded-lg px-4 py-2 text-white"
           disabled={isGeneratingResponse}
         >
-          {isGeneratingResponse && (
-            <span className="loading loading-spinner loading-xs opacity-75" />
-          )}
-          <span>Send</span>
+          Send
         </Button>
       </form>
     </div>
