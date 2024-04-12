@@ -1,8 +1,10 @@
 "use client";
 
+import FileSelect from "@/components/home/file-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import createClient from "@/lib/supabase/client";
+import uploadFile from "@/lib/supabase/upload-file";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { ChatPromptTemplate, MessagesPlaceholder } from "langchain/prompts";
 import { RunnableSequence } from "langchain/runnables";
@@ -10,19 +12,13 @@ import { AIMessage, HumanMessage } from "langchain/schema";
 import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const supabase = createClient();
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 });
-const vectorStore = new SupabaseVectorStore(embeddings, {
-  client: supabase,
-  tableName: "documents",
-  // filter: { source: "public/Seisuke_Yamada_Resume.pdf" },
-  queryName: "match_documents",
-});
-const retriever = vectorStore.asRetriever();
 
 const model = new ChatOpenAI({
   openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -34,25 +30,41 @@ export default function Home() {
   const [conversationHistory, setConversationHistory] = useState<
     (HumanMessage | AIMessage)[]
   >([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [vectorStore, setVectorStore] = useState<SupabaseVectorStore>();
+  const [isPreparingVectors, setIsPreparingVectors] = useState(false);
 
-  useEffect(() => {
-    const run = async () => {};
-    run();
-  }, []);
-
-  const storeVectors = async () => {
+  const storeVectors = async (fileUrl: string) => {
     const res = await fetch(`/api/store-vector`, {
       method: "POST",
-      // body: JSON.stringify(submitData),
       headers: {
         "content-type": "application/json",
       },
+      body: JSON.stringify({
+        fileUrl: fileUrl,
+      }),
     });
     console.log("res", res);
   };
 
+  const handleFileSubmit = async () => {
+    if (files.length > 0) {
+      setIsPreparingVectors(true);
+      const fileUrl = await uploadFile(uuidv4(), files[0]);
+      await storeVectors(fileUrl);
+      const vectorStore = new SupabaseVectorStore(embeddings, {
+        client: supabase,
+        tableName: "documents",
+        // filter: { source: fileUrl },
+        queryName: "match_documents",
+      });
+      setVectorStore(vectorStore);
+      setIsPreparingVectors(false);
+    }
+  };
+
   const handleSubmit = async () => {
-    // await storeVectors();
+    if (!vectorStore) return;
 
     const prompt = ChatPromptTemplate.fromMessages([
       [
@@ -62,6 +74,7 @@ export default function Home() {
       new MessagesPlaceholder("conversation_history"),
       ["user", "{question}"],
     ]);
+    const retriever = vectorStore.asRetriever();
     const retrieverChain = RunnableSequence.from([
       (prevResult) => prevResult.question,
       retriever,
@@ -92,10 +105,28 @@ export default function Home() {
   console.log("conversationHistory", conversationHistory);
 
   return (
-    <main className="relative flex flex-col items-center gap-y-4 p-24">
-      <h1 className="text-primary text-2xl font-bold">Talk to AI with PDF</h1>
-
+    <div className="relative flex flex-col items-center gap-y-8 p-24">
+      <h1 className="border-primary rounded-sm border-4 px-8 py-4 text-2xl font-bold text-white">
+        Talk to AI with PDF
+      </h1>
       <div className="flex w-full flex-col gap-y-4">
+        <FileSelect files={files} setFiles={setFiles} acceptedFileCount={1} />
+        {(!vectorStore || isPreparingVectors) && (
+          <div className="flex justify-center">
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                handleFileSubmit();
+              }}
+              disabled={isPreparingVectors}
+            >
+              OK
+            </Button>
+          </div>
+        )}
+        {vectorStore && (
+          <div className="text-center text-lg font-semibold underline">{`You are all set. Let's start asking AI about the file!`}</div>
+        )}
         {conversationHistory.map(
           (conversation: HumanMessage | AIMessage, index: number) => (
             <div
@@ -127,6 +158,6 @@ export default function Home() {
           Submit
         </Button>
       </div>
-    </main>
+    </div>
   );
 }
