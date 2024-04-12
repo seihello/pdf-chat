@@ -151,21 +151,21 @@ export default function Home() {
         )}
       </div>
 
-      <div className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black py-2">
+      <form
+        className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black py-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
         <Input
           className="flex-1 border bg-white p-2"
           onChange={(e) => setUserInput(e.target.value)}
         />
-        <Button
-          onClick={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-          className="rounded-lg px-4 py-2 text-white"
-        >
+        <Button type="submit" className="rounded-lg px-4 py-2 text-white">
           Submit
         </Button>
-      </div>
+      </form>
     </div>
   );
 }
