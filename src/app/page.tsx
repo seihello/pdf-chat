@@ -70,6 +70,9 @@ export default function Home() {
   const handleSubmit = async () => {
     if (!vectorStore) return;
 
+    setConversationHistory((prev) => [...prev, new HumanMessage(userInput)]);
+    setUserInput("");
+
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
@@ -98,11 +101,7 @@ export default function Home() {
       conversation_history: conversationHistory,
       question: userInput,
     });
-    setConversationHistory((prev) => [
-      ...prev,
-      new HumanMessage(userInput),
-      new AIMessage(res),
-    ]);
+    setConversationHistory((prev) => [...prev, new AIMessage(res)]);
     setResponse(res);
   };
 
@@ -161,6 +160,7 @@ export default function Home() {
         <Input
           className="flex-1 border bg-white p-2"
           onChange={(e) => setUserInput(e.target.value)}
+          value={userInput}
         />
         <Button type="submit" className="rounded-lg px-4 py-2 text-white">
           Submit
