@@ -65,6 +65,7 @@ export default function Home() {
 
       fileInputRef.current?.classList.remove("max-h-[360px]");
       fileInputRef.current?.classList.add("max-h-0");
+
       setVectorStore(vectorStore);
 
       setTimeout(() => {
@@ -115,16 +116,17 @@ export default function Home() {
   };
 
   return (
-    <div className="relative flex flex-col items-center gap-y-8 p-24">
+    <div className="relative flex flex-col items-center p-24">
       <h1 className="rounded-sm border-4 border-primary px-8 py-4 text-2xl font-bold text-white">
         Talk to AI with PDF
       </h1>
       <div className="flex w-full flex-col">
         {(!vectorStore || isPreparingVectors) && (
           <div
-            className="mb-4 flex max-h-[360px] flex-col gap-y-2 overflow-hidden transition-all duration-[2000ms]"
+            className="flex max-h-[360px] flex-col gap-y-2 overflow-hidden transition-all duration-[2000ms]"
             ref={fileInputRef}
           >
+            <div className="min-h-8" />
             <FileSelect
               files={files}
               setFiles={setFiles}
@@ -148,7 +150,7 @@ export default function Home() {
           </div>
         )}
         {vectorStore && (
-          <div className="text-center text-lg font-semibold underline">{`You are all set. Let's start asking AI about the file!`}</div>
+          <div className="mt-8 text-center text-lg font-semibold underline">{`You are all set. Let's start asking AI about the file!`}</div>
         )}
         <div className="mt-8 flex flex-col gap-y-4">
           {conversationHistory.map(
@@ -175,27 +177,29 @@ export default function Home() {
         )}
       </div>
 
-      <form
-        className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black py-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-      >
-        <Input
-          className="flex-1 border bg-white p-2"
-          onChange={(e) => setUserInput(e.target.value)}
-          value={userInput}
-          placeholder="Teach me a summary of this file..."
-        />
-        <Button
-          type="submit"
-          className="flex items-center gap-x-1 rounded-lg px-4 py-2 text-white"
-          disabled={isGeneratingResponse}
+      {vectorStore && (
+        <form
+          className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black py-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
         >
-          Send
-        </Button>
-      </form>
+          <Input
+            className="flex-1 border bg-white p-2"
+            onChange={(e) => setUserInput(e.target.value)}
+            value={userInput}
+            placeholder="Teach me a summary of this file..."
+          />
+          <Button
+            type="submit"
+            className="flex items-center gap-x-1 rounded-lg px-4 py-2 text-white"
+            disabled={isGeneratingResponse}
+          >
+            Send
+          </Button>
+        </form>
+      )}
     </div>
   );
 }
