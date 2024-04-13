@@ -12,7 +12,7 @@ import { AIMessage, HumanMessage } from "langchain/schema";
 import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const supabase = createClient();
@@ -33,6 +33,8 @@ export default function Home() {
   const [vectorStore, setVectorStore] = useState<SupabaseVectorStore>();
   const [isPreparingVectors, setIsPreparingVectors] = useState(false);
   const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
+
+  const fileInputRef = useRef<HTMLDivElement | null>(null);
 
   const storeVectors = async (sessionId: string, fileUrl: string) => {
     const res = await fetch(`/api/store-vector`, {
@@ -60,8 +62,14 @@ export default function Home() {
         filter: { session_id: sessionId },
         queryName: "match_documents",
       });
+
+      fileInputRef.current?.classList.remove("max-h-[360px]");
+      fileInputRef.current?.classList.add("max-h-0");
       setVectorStore(vectorStore);
-      setIsPreparingVectors(false);
+
+      setTimeout(() => {
+        setIsPreparingVectors(false);
+      }, 5000);
     }
   };
 
@@ -111,42 +119,53 @@ export default function Home() {
       <h1 className="rounded-sm border-4 border-primary px-8 py-4 text-2xl font-bold text-white">
         Talk to AI with PDF
       </h1>
-      <div className="flex w-full flex-col gap-y-4">
-        <FileSelect files={files} setFiles={setFiles} acceptedFileCount={1} />
+      <div className="flex w-full flex-col">
         {(!vectorStore || isPreparingVectors) && (
-          <div className="flex justify-center">
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                handleFileSubmit();
-              }}
-              disabled={isPreparingVectors}
-              className="flex items-center gap-x-1"
-            >
-              {isPreparingVectors && (
-                <span className="loading loading-spinner loading-xs opacity-75" />
-              )}
-              <span>OK</span>
-            </Button>
+          <div
+            className="mb-4 flex max-h-[360px] flex-col gap-y-2 overflow-hidden transition-all duration-[2000ms]"
+            ref={fileInputRef}
+          >
+            <FileSelect
+              files={files}
+              setFiles={setFiles}
+              acceptedFileCount={1}
+            />
+            <div className="flex justify-center">
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleFileSubmit();
+                }}
+                disabled={isPreparingVectors}
+                className="flex items-center gap-x-1"
+              >
+                {isPreparingVectors && (
+                  <span className="loading loading-spinner loading-xs opacity-75" />
+                )}
+                <span>OK</span>
+              </Button>
+            </div>
           </div>
         )}
         {vectorStore && (
           <div className="text-center text-lg font-semibold underline">{`You are all set. Let's start asking AI about the file!`}</div>
         )}
-        {conversationHistory.map(
-          (conversation: HumanMessage | AIMessage, index: number) => (
-            <div
-              key={index}
-              className={`flex ${index % 2 === 0 ? "justify-end" : "justify-start"}`}
-            >
+        <div className="mt-8 flex flex-col gap-y-4">
+          {conversationHistory.map(
+            (conversation: HumanMessage | AIMessage, index: number) => (
               <div
-                className={`mr-0 rounded-lg px-4 py-2 ${index % 2 === 0 ? "bg-primary text-white" : "bg-gray-200 text-gray-900"}`}
+                key={index}
+                className={`flex ${index % 2 === 0 ? "justify-end" : "justify-start"}`}
               >
-                {conversation.content.toString()}
+                <div
+                  className={`mr-0 rounded-lg px-4 py-2 ${index % 2 === 0 ? "bg-primary text-white" : "bg-gray-200 text-gray-900"}`}
+                >
+                  {conversation.content.toString()}
+                </div>
               </div>
-            </div>
-          ),
-        )}
+            ),
+          )}
+        </div>
         {isGeneratingResponse && (
           <div className="flex justify-start">
             <div className="mr-0 flex items-center rounded-lg bg-gray-200 px-4 py-2 text-gray-900">

@@ -75,6 +75,7 @@ const config: Config = {
   ],
   daisyui: {
     base: false,
+    darkTheme: false,
   },
 };
 export default config;
