@@ -186,6 +186,7 @@ export default function Home() {
           className="flex-1 border bg-white p-2"
           onChange={(e) => setUserInput(e.target.value)}
           value={userInput}
+          placeholder="Teach me a summary of this file..."
         />
         <Button
           type="submit"
