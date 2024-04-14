@@ -49,7 +49,6 @@ export default function Home() {
         file_url: fileUrl,
       }),
     });
-    console.log("storeVectors Response", res);
   };
 
   const handleFileSubmit = async () => {
