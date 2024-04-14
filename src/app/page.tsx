@@ -118,7 +118,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative flex flex-col items-center p-24">
+    <div className="relative flex flex-col items-center px-2 py-24">
       <h1 className="rounded-sm px-8 py-4 text-4xl font-bold text-white">
         Talk to AI with PDF
       </h1>
@@ -214,7 +214,6 @@ export default function Home() {
           </Button>
         </form>
       )}
-      <div className="absolute -top-[400px] left-1/2 -z-50 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-primary opacity-60 blur-[200px]"></div>
     </div>
   );
 }
