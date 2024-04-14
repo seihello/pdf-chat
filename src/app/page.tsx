@@ -118,8 +118,8 @@ export default function Home() {
   };
 
   return (
-    <div className="relative flex flex-col items-center px-2 py-24">
-      <h1 className="rounded-sm px-8 py-4 text-4xl font-bold text-white">
+    <div className="relative flex flex-col items-center px-2 py-12 sm:py-24">
+      <h1 className="rounded-sm px-8 py-4 text-3xl font-bold text-white sm:text-4xl">
         Talk to AI with PDF
       </h1>
       <div className="flex w-full flex-col">
@@ -153,7 +153,11 @@ export default function Home() {
         )}
         {vectorStore && (
           <div className="flex flex-col items-center gap-y-16">
-            <div className="mt-8 text-center text-lg font-semibold">{`You are all set. Let's start asking AI about the file!`}</div>
+            <div className="mt-8 whitespace-pre text-center text-lg font-semibold">
+              {`You are all set.`}
+              <wbr />
+              {` Let's start asking AI about the file!`}
+            </div>
             {conversationHistory.length === 0 && (
               <FaAnglesDown
                 size={64}
@@ -192,7 +196,7 @@ export default function Home() {
 
       {vectorStore && (
         <form
-          className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black pb-8 pt-2"
+          className="fixed bottom-0 flex w-full max-w-[888px] flex-col gap-x-2 gap-y-2 bg-black px-2 pb-8 pt-2 sm:flex-row"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
