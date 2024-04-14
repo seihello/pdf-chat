@@ -15,14 +15,9 @@ export async function POST(req: Request) {
 
   try {
     const { session_id, file_url } = await req.json();
-    console.log("file_url", file_url);
-    console.log("session_id", file_url);
 
     const response = await fetch(file_url);
-    console.log("response", response);
-
     const blob = await response.blob();
-    console.log("blob", blob);
 
     // Request the OpenAI API for the response based on the prompt
     const loader = new PDFLoader(blob, {
@@ -30,26 +25,16 @@ export async function POST(req: Request) {
     });
 
     const docs = await loader.load();
-    console.log("docs", docs);
-
     const textSplitter = new CharacterTextSplitter({
       chunkSize: 1000,
       chunkOverlap: 200,
     });
-
     const docsWithMetadata = docs.map((doc) => {
       return { ...doc, metadata: { ...doc.metadata, session_id: session_id } };
     });
-
     const splitDocs = await textSplitter.splitDocuments(docsWithMetadata);
-    console.log({ splitDocs });
 
     const supabase = await createClient();
-
-    console.log(
-      "NEXT_PUBLIC_OPENAI_API_KEY",
-      process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-    );
     await SupabaseVectorStore.fromDocuments(
       splitDocs,
       new OpenAIEmbeddings({
