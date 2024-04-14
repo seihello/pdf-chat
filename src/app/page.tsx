@@ -13,6 +13,7 @@ import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
 import { useRef, useState } from "react";
+import { FaAnglesDown } from "react-icons/fa6";
 import { v4 as uuidv4 } from "uuid";
 
 const supabase = createClient();
@@ -35,6 +36,7 @@ export default function Home() {
   const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
 
   const fileInputRef = useRef<HTMLDivElement | null>(null);
+  const questionInputRef = useRef<HTMLInputElement | null>(null);
 
   const storeVectors = async (sessionId: string, fileUrl: string) => {
     const res = await fetch(`/api/store-vector`, {
@@ -150,7 +152,18 @@ export default function Home() {
           </div>
         )}
         {vectorStore && (
-          <div className="mt-8 text-center text-lg font-semibold underline">{`You are all set. Let's start asking AI about the file!`}</div>
+          <div className="flex flex-col items-center gap-y-16">
+            <div className="mt-8 text-center text-lg font-semibold">{`You are all set. Let's start asking AI about the file!`}</div>
+            {conversationHistory.length === 0 && (
+              <FaAnglesDown
+                size={64}
+                className="animate-bounce cursor-pointer"
+                onClick={() => {
+                  questionInputRef.current?.focus();
+                }}
+              />
+            )}
+          </div>
         )}
         <div className="mt-8 flex flex-col gap-y-4">
           {conversationHistory.map(
@@ -179,7 +192,7 @@ export default function Home() {
 
       {vectorStore && (
         <form
-          className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black py-2"
+          className="fixed bottom-0 flex w-full max-w-[888px] gap-x-2 bg-black pb-8 pt-2"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
@@ -190,6 +203,7 @@ export default function Home() {
             onChange={(e) => setUserInput(e.target.value)}
             value={userInput}
             placeholder="Teach me a summary of this file..."
+            ref={questionInputRef}
           />
           <Button
             type="submit"
