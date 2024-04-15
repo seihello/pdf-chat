@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-black text-white`}>
         <div className="relative min-h-screen overflow-hidden">
-          <main className="mx-auto w-screen max-w-[1080px]">{children}</main>
+          <main className="mx-auto w-screen max-w-[900px]">{children}</main>
           <div className="absolute -top-[400px] left-1/2 -z-50 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-primary opacity-60 blur-[200px]"></div>
         </div>
       </body>

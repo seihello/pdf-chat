@@ -136,7 +136,7 @@ export default function Home() {
                   disabled={isPreparingVectors}
                   className="w-full sm:w-auto"
                 >
-                  <span>Send</span>
+                  Send
                 </Button>
               </div>
             </div>
@@ -161,15 +161,6 @@ export default function Home() {
               <wbr />
               {` Let's start asking AI about the file!`}
             </div>
-            {conversationHistory.length === 0 && (
-              <FaAnglesDown
-                size={64}
-                className="animate-bounce cursor-pointer"
-                onClick={() => {
-                  questionInputRef.current?.focus();
-                }}
-              />
-            )}
           </div>
         )}
 
@@ -199,36 +190,47 @@ export default function Home() {
       </div>
 
       {vectorStore && (
-        <form
-          className="fixed bottom-0 flex w-full max-w-[888px] flex-col gap-x-2 gap-y-2 bg-black px-2 pb-8 pt-2 sm:flex-row sm:items-end"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <Textarea
-            className="!min-h-0 resize-none border bg-white p-2 sm:flex-1"
-            onChange={(e) => {
-              setUserInput(e.target.value);
-              if (questionInputRef.current) {
-                questionInputRef.current.style.height = "36px";
-                questionInputRef.current.style.height =
-                  questionInputRef.current.scrollHeight + "px";
-              }
+        <div className="fixed bottom-0 flex w-screen flex-col items-center gap-y-4 bg-black px-2 pb-8 pt-2">
+          {conversationHistory.length === 0 && (
+            <FaAnglesDown
+              size={64}
+              className="animate-bounce cursor-pointer"
+              onClick={() => {
+                questionInputRef.current?.focus();
+              }}
+            />
+          )}
+          <form
+            className="flex w-full max-w-[900px] flex-col gap-x-2 gap-y-2 sm:flex-row sm:items-end"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
             }}
-            value={userInput}
-            placeholder="Teach me a summary of this file..."
-            ref={questionInputRef}
-            rows={1}
-          />
-          <Button
-            type="submit"
-            className="flex items-center gap-x-1 rounded-lg px-4 py-2 text-white"
-            disabled={isGeneratingResponse}
           >
-            Send
-          </Button>
-        </form>
+            <Textarea
+              className="!min-h-0 resize-none border bg-white p-2 sm:flex-1"
+              onChange={(e) => {
+                setUserInput(e.target.value);
+                if (questionInputRef.current) {
+                  questionInputRef.current.style.height = "36px";
+                  questionInputRef.current.style.height =
+                    questionInputRef.current.scrollHeight + "px";
+                }
+              }}
+              value={userInput}
+              placeholder="Teach me a summary of this file..."
+              ref={questionInputRef}
+              rows={1}
+            />
+            <Button
+              type="submit"
+              className="flex items-center gap-x-1 rounded-lg px-4 py-2 text-white"
+              disabled={isGeneratingResponse}
+            >
+              Send
+            </Button>
+          </form>
+        </div>
       )}
     </div>
   );
