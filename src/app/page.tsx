@@ -12,7 +12,7 @@ import { AIMessage, HumanMessage } from "langchain/schema";
 import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaAnglesDown, FaRegFilePdf } from "react-icons/fa6";
 import { v4 as uuidv4 } from "uuid";
 
@@ -120,8 +120,12 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    window.scrollTo({ top: window.innerHeight });
+  }, [conversationHistory]);
+
   return (
-    <div className="relative flex flex-col items-center gap-y-4 px-2 py-12 sm:py-24">
+    <div className="relative flex flex-col items-center gap-y-4 overflow-scroll px-2 py-12 sm:py-24">
       <h1 className="rounded-sm px-8 py-4 text-3xl font-bold text-white sm:text-4xl">
         Talk to AI with PDF
       </h1>
