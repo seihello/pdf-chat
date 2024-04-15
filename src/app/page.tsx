@@ -2,7 +2,7 @@
 
 import FileSelect from "@/components/home/file-select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import createClient from "@/lib/supabase/client";
 import uploadFile from "@/lib/supabase/upload-file";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
@@ -36,7 +36,7 @@ export default function Home() {
   const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
 
   const fileInputRef = useRef<HTMLDivElement | null>(null);
-  const questionInputRef = useRef<HTMLInputElement | null>(null);
+  const questionInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const storeVectors = async (sessionId: string, fileUrl: string) => {
     const res = await fetch(`/api/store-vector`, {
@@ -64,14 +64,8 @@ export default function Home() {
         queryName: "match_documents",
       });
 
-      fileInputRef.current?.classList.remove("max-h-[360px]");
-      fileInputRef.current?.classList.add("max-h-0");
-
       setVectorStore(vectorStore);
-
-      setTimeout(() => {
-        setIsPreparingVectors(false);
-      }, 5000);
+      setIsPreparingVectors(false);
     }
   };
 
@@ -86,7 +80,7 @@ export default function Home() {
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
-        `Answer the question based ONLY on the following context: {context}. Even if you can't find the answer in this context, don't search external information. Just say "I'm sorry. I can't find the information."`,
+        `Answer the question based ONLY on the following context: {context}. Even if you can't find the answer in this context, don't search external information. Just say "I'm sorry. I can't find relevant information."`,
       ],
       new MessagesPlaceholder("conversation_history"),
       ["user", "{question}"],
@@ -117,42 +111,48 @@ export default function Home() {
   };
 
   return (
-    <div className="relative flex flex-col items-center px-2 py-12 sm:py-24">
+    <div className="relative flex flex-col items-center gap-y-4 px-2 py-12 sm:py-24">
       <h1 className="rounded-sm px-8 py-4 text-3xl font-bold text-white sm:text-4xl">
         Talk to AI with PDF
       </h1>
       <div className="flex w-full flex-col">
-        {(!vectorStore || isPreparingVectors) && (
-          <div
-            className="flex max-h-[360px] flex-col gap-y-2 overflow-hidden transition-all duration-[2000ms]"
-            ref={fileInputRef}
-          >
-            <div className="min-h-8" />
-            <FileSelect
-              files={files}
-              setFiles={setFiles}
-              acceptedFileCount={1}
-            />
-            <div className="flex justify-center">
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleFileSubmit();
-                }}
-                disabled={isPreparingVectors}
-                className="flex items-center gap-x-1"
-              >
-                {isPreparingVectors && (
-                  <span className="loading loading-spinner loading-xs opacity-75" />
-                )}
-                <span>OK</span>
-              </Button>
+        {!vectorStore ? (
+          !isPreparingVectors ? (
+            <div
+              className="flex flex-col gap-y-2 overflow-hidden"
+              ref={fileInputRef}
+            >
+              <FileSelect
+                files={files}
+                setFiles={setFiles}
+                acceptedFileCount={1}
+              />
+              <div className="flex justify-center">
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleFileSubmit();
+                  }}
+                  disabled={isPreparingVectors}
+                  className="w-full sm:w-auto"
+                >
+                  <span>Send</span>
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-        {vectorStore && (
-          <div className="flex flex-col items-center gap-y-16">
-            <div className="mt-8 whitespace-pre text-center text-lg font-semibold">
+          ) : (
+            <div className="flex h-48 items-center justify-center">
+              <span className="loading loading-spinner loading-md opacity-75" />
+            </div>
+          )
+        ) : (
+          <div
+            className="flex flex-col items-center gap-y-16"
+            style={{
+              animation: "2s linear fade-in",
+            }}
+          >
+            <div className="whitespace-pre text-center text-lg font-semibold">
               {`You are all set.`}
               <wbr />
               {` Let's start asking AI about the file!`}
@@ -168,6 +168,7 @@ export default function Home() {
             )}
           </div>
         )}
+
         <div className="mt-8 flex flex-col gap-y-4">
           {conversationHistory.map(
             (conversation: HumanMessage | AIMessage, index: number) => (
@@ -195,18 +196,26 @@ export default function Home() {
 
       {vectorStore && (
         <form
-          className="fixed bottom-0 flex w-full max-w-[888px] flex-col gap-x-2 gap-y-2 bg-black px-2 pb-8 pt-2 sm:flex-row"
+          className="fixed bottom-0 flex w-full max-w-[888px] flex-col gap-x-2 gap-y-2 bg-black px-2 pb-8 pt-2 sm:flex-row sm:items-end"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
           }}
         >
-          <Input
-            className="flex-1 border bg-white p-2"
-            onChange={(e) => setUserInput(e.target.value)}
+          <Textarea
+            className="!min-h-0 resize-none border bg-white p-2 sm:flex-1"
+            onChange={(e) => {
+              setUserInput(e.target.value);
+              if (questionInputRef.current) {
+                questionInputRef.current.style.height = "36px";
+                questionInputRef.current.style.height =
+                  questionInputRef.current.scrollHeight + "px";
+              }
+            }}
             value={userInput}
             placeholder="Teach me a summary of this file..."
             ref={questionInputRef}
+            rows={1}
           />
           <Button
             type="submit"

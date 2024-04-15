@@ -60,20 +60,18 @@ export default function FileSelect({
         <div className="text-destructive">{alertMessage}</div>
       )}
       {files.length > 0 && (
-        <div className="flex flex-col gap-y-2">
+        <div className="flex w-full flex-col items-center gap-y-2">
           {files.map((file: File, index: number) => (
             <div
               key={index}
-              className="flex w-[640px] items-center justify-between gap-x-2 rounded-sm bg-white px-4 py-2"
+              className="flex w-full max-w-[480px] items-center justify-between gap-x-2 rounded-sm bg-white px-4 py-2"
             >
-              <div className="flex items-center gap-x-2 whitespace-nowrap">
-                <div className="max-w-[480px] flex-1 overflow-hidden text-ellipsis text-gray-700">
-                  {file.name}
-                </div>
+              <div className="flex flex-1 shrink items-center gap-x-2 overflow-hidden text-ellipsis whitespace-nowrap text-gray-700">
+                {file.name}
               </div>
               <Button
                 variant="ghost"
-                className="p-0"
+                className="!min-w-0 p-0 hover:bg-none"
                 onClick={(e) => {
                   e.stopPropagation();
                   const newFiles = [...files];
