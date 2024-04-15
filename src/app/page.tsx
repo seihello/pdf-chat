@@ -13,7 +13,7 @@ import { StringOutputParser } from "langchain/schema/output_parser";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
 import { useRef, useState } from "react";
-import { FaAnglesDown } from "react-icons/fa6";
+import { FaAnglesDown, FaRegFilePdf } from "react-icons/fa6";
 import { v4 as uuidv4 } from "uuid";
 
 const supabase = createClient();
@@ -147,11 +147,15 @@ export default function Home() {
           )
         ) : (
           <div
-            className="flex flex-col items-center gap-y-16"
+            className="flex flex-col items-center gap-y-8"
             style={{
               animation: "2s linear fade-in",
             }}
           >
+            <div className="flex max-w-[680px] items-center justify-between gap-x-2 rounded-sm bg-white px-12 py-6">
+              <FaRegFilePdf className="text-destructive" size={20} />
+              <div className="text-gray-900">{files[0].name}</div>
+            </div>
             <div className="whitespace-pre text-center text-lg font-semibold">
               {`You are all set.`}
               <wbr />

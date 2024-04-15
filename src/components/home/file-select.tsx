@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { FaCloudArrowUp, FaRegTrashCan } from "react-icons/fa6";
+import { FaCloudArrowUp, FaRegFilePdf, FaRegTrashCan } from "react-icons/fa6";
 
 interface Props {
   files: File[];
@@ -71,6 +71,7 @@ export default function FileSelect({
               key={index}
               className="flex w-full max-w-[480px] items-center justify-between gap-x-2 rounded-sm bg-white px-4 py-2"
             >
+              <FaRegFilePdf size={20} className="text-destructive" />
               <div className="flex flex-1 shrink items-center gap-x-2 overflow-hidden text-ellipsis whitespace-nowrap text-gray-700">
                 {file.name}
               </div>
@@ -84,7 +85,7 @@ export default function FileSelect({
                   setFiles(newFiles);
                 }}
               >
-                <FaRegTrashCan size={16} />
+                <FaRegTrashCan size={20} />
               </Button>
             </div>
           ))}
