@@ -76,6 +76,9 @@ export default function Home() {
 
     setConversationHistory((prev) => [...prev, new HumanMessage(userInput)]);
     setUserInput("");
+    if (questionInputRef.current) {
+      questionInputRef.current.style.height = "36px";
+    }
 
     const prompt = ChatPromptTemplate.fromMessages([
       [
@@ -108,6 +111,13 @@ export default function Home() {
     setConversationHistory((prev) => [...prev, new AIMessage(res)]);
 
     setIsGeneratingResponse(false);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSubmit();
+    }
   };
 
   return (
@@ -217,6 +227,7 @@ export default function Home() {
                     questionInputRef.current.scrollHeight + "px";
                 }
               }}
+              onKeyDown={handleKeyDown}
               value={userInput}
               placeholder="Teach me a summary of this file..."
               ref={questionInputRef}
