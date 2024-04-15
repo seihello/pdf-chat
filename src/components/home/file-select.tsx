@@ -48,13 +48,18 @@ export default function FileSelect({
       <FaCloudArrowUp size={64} />
       <input {...getInputProps()} />
       <div className="w-full text-center">
-        Drag and drop up to{" "}
-        <span className="font-bold">{acceptedFileCount} </span> PDF file
-        {acceptedFileCount === 1 ? "" : "s"} here, or click to select file
-        {acceptedFileCount === 1 ? "" : "s"}.
+        Drag and drop <span className="font-bold">{acceptedFileCount} </span>{" "}
+        PDF file
+        {acceptedFileCount === 1 ? "" : "s"} here, or click to select
+        {acceptedFileCount === 1 ? " a file" : " files"}.
       </div>
-      <div>
-        Maximum file size: <b>30MB</b>
+      <div className="flex flex-col items-center">
+        <p>
+          *Maximum file size is <b>30MB</b>.
+        </p>
+        <p>
+          *We only accept a file written in <b>English</b>.
+        </p>
       </div>
       {alertMessage.length > 0 && (
         <div className="text-destructive">{alertMessage}</div>
