@@ -1,5 +1,6 @@
 # PDF Chat
 An application where you can chat with AI and ask questions about a PDF file you uploaded
+
 https://pdf-chat.seisuke.info/
 
 ![Showcase](/public/showcase.png)
