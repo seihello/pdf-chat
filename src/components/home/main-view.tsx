@@ -233,7 +233,7 @@ export default function MainView() {
               }}
               onKeyDown={handleKeyDown}
               value={userInput}
-              placeholder="Teach me a summary of this file..."
+              placeholder="e.g., Teach me the summary of this file."
               ref={questionInputRef}
               rows={1}
             />
