@@ -156,8 +156,9 @@ export default function MainView() {
               </div>
             </div>
           ) : (
-            <div className="flex h-48 items-center justify-center">
-              <span className="loading loading-spinner loading-md opacity-75" />
+            <div className="flex flex-col items-center gap-y-8">
+              <img src="/chatting.svg" className="h-auto w-96 animate-pulse" />
+              <p>Wait a moment for our AI to be ready...</p>
             </div>
           )
         ) : (
