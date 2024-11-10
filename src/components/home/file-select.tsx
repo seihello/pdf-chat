@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaCloudArrowUp, FaRegFilePdf, FaRegTrashCan } from "react-icons/fa6";
@@ -91,6 +92,19 @@ export default function FileSelect({
           ))}
         </div>
       )}
+      <div className="flex items-center justify-center gap-x-2 bg-yellow-50 p-2 text-center">
+        <IconAlertTriangle className="-mt-[3px] text-yellow-500" />
+        <div className="flex flex-col items-center text-sm text-yellow-900">
+          <span>
+            Uploaded files will not be viewed by others or used for any purpose
+            other than conversations with AI.
+          </span>
+          <span>
+            However, if you are concerned, please avoid uploading files that
+            contain personal information.
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
