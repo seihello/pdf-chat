@@ -15,20 +15,16 @@ export default function FileSelect({
   setFiles,
   acceptedFileCount,
 }: Props) {
-  const [alertMessage, setAlertMessage] = useState("");
+  const [isFileSelectedOnce, setIsFileSelectedOnce] = useState(false);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length >= 1) {
-        if (files.length + acceptedFiles.length <= acceptedFileCount) {
-          setFiles([...files, ...acceptedFiles]);
-          setAlertMessage("");
-        } else {
-          setAlertMessage(`Please select ${acceptedFileCount} file(s) or less`);
-        }
+        setFiles([...files, ...acceptedFiles]);
+        setIsFileSelectedOnce(true);
       }
     },
-    [files, setFiles, acceptedFileCount],
+    [files, setFiles],
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
@@ -62,8 +58,8 @@ export default function FileSelect({
           *We only accept a file written in <b>English</b>.
         </p>
       </div>
-      {alertMessage.length > 0 && (
-        <div className="text-destructive">{alertMessage}</div>
+      {isFileSelectedOnce && files.length !== acceptedFileCount && (
+        <div className="text-destructive">{`Please select ${acceptedFileCount} file(s) or less`}</div>
       )}
       {files.length > 0 && (
         <div className="flex w-full flex-col items-center gap-y-2">
