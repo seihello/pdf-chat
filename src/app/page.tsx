@@ -25,11 +25,11 @@ export default function RootPage() {
       <h1 className="rounded-sm px-8 py-4 text-center text-3xl font-bold text-white sm:text-4xl">
         Talk your file with AI!
       </h1>
-      {false ? (
+      {isLoading ? (
         <div className="flex items-center justify-center">
           Checking status...
         </div>
-      ) : false ? (
+      ) : isRunning ? (
         <MainView />
       ) : (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-y-8">
