@@ -127,7 +127,7 @@ export default function MainView() {
   return (
     <div className="relative flex flex-col items-center gap-y-4 overflow-scroll px-2 py-12 sm:py-24">
       <h1 className="rounded-sm px-8 py-4 text-3xl font-bold text-white sm:text-4xl">
-        Let’s talk your file with AI!
+        Talk your file with AI!
       </h1>
       <div className="flex w-full flex-col">
         {!vectorStore ? (
