@@ -23,7 +23,7 @@ export default function RootPage() {
   return (
     <div className="flex flex-col items-stretch gap-y-4 px-2 py-12 sm:py-24">
       <h1 className="rounded-sm px-8 py-4 text-center text-3xl font-bold text-white sm:text-4xl">
-        Talk your file with AI!
+        Talk about your file with AI!
       </h1>
       {isLoading ? (
         <div className="flex items-center justify-center">
