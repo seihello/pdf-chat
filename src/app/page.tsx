@@ -20,16 +20,26 @@ export default function RootPage() {
     getSupabaseRunning();
   }, []);
 
-  return isLoading ? (
-    <div className="flex h-80 items-center justify-center">
-      Checking status...
-    </div>
-  ) : isRunning ? (
-    <MainView />
-  ) : (
-    <div className="flex h-80 items-center justify-center">
-      {`I'm sorry. The service is currently unavailable due to maintenance. Please
-      try again later.`}
+  return (
+    <div className="flex flex-col items-stretch gap-y-4 px-2 py-12 sm:py-24">
+      <h1 className="rounded-sm px-8 py-4 text-center text-3xl font-bold text-white sm:text-4xl">
+        Talk your file with AI!
+      </h1>
+      {false ? (
+        <div className="flex items-center justify-center">
+          Checking status...
+        </div>
+      ) : false ? (
+        <MainView />
+      ) : (
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-y-8">
+          <p>
+            {`I'm sorry. The service is currently unavailable due to maintenance. Please
+          try again later.`}
+          </p>
+          <img src="/maintenance.svg" className="h-auto w-96" />
+        </div>
+      )}
     </div>
   );
 }

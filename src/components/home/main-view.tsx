@@ -127,10 +127,7 @@ export default function MainView() {
   }, [conversationHistory]);
 
   return (
-    <div className="relative flex flex-col items-center gap-y-4 overflow-scroll px-2 py-12 sm:py-24">
-      <h1 className="rounded-sm px-8 py-4 text-3xl font-bold text-white sm:text-4xl">
-        Talk your file with AI!
-      </h1>
+    <div className="relative flex flex-col items-center gap-y-4 overflow-scroll ">
       <div className="flex w-full flex-col">
         {!vectorStore ? (
           !isPreparingVectors ? (
