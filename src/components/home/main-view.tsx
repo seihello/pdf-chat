@@ -16,6 +16,8 @@ import { useEffect, useRef, useState } from "react";
 import { FaAnglesDown, FaRegFilePdf } from "react-icons/fa6";
 import { v4 as uuidv4 } from "uuid";
 
+const ACCEPTED_FILE_COUNT = 1;
+
 const supabase = createClient();
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -139,7 +141,7 @@ export default function MainView() {
               <FileSelect
                 files={files}
                 setFiles={setFiles}
-                acceptedFileCount={1}
+                acceptedFileCount={ACCEPTED_FILE_COUNT}
               />
               <div className="flex justify-center">
                 <Button
@@ -147,7 +149,9 @@ export default function MainView() {
                     e.preventDefault();
                     handleFileSubmit();
                   }}
-                  disabled={isPreparingVectors}
+                  disabled={
+                    isPreparingVectors || files.length !== ACCEPTED_FILE_COUNT
+                  }
                   className="w-full sm:w-auto"
                 >
                   Send
