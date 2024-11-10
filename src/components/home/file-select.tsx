@@ -59,7 +59,7 @@ export default function FileSelect({
         </p>
       </div>
       {isFileSelectedOnce && files.length !== acceptedFileCount && (
-        <div className="text-destructive">{`Please select ${acceptedFileCount} file(s) or less`}</div>
+        <div className="text-destructive">{`Please select ${acceptedFileCount} ${acceptedFileCount === 1 ? "file" : "files or less"}.`}</div>
       )}
       {files.length > 0 && (
         <div className="flex w-full flex-col items-center gap-y-2">
