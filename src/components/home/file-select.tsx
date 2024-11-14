@@ -8,12 +8,14 @@ interface Props {
   files: File[];
   setFiles: (files: File[]) => void;
   acceptedFileCount: number;
+  errorMessage: string;
 }
 
 export default function FileSelect({
   files,
   setFiles,
   acceptedFileCount,
+  errorMessage,
 }: Props) {
   const [isFileSelectedOnce, setIsFileSelectedOnce] = useState(false);
 
@@ -42,6 +44,9 @@ export default function FileSelect({
       {...getRootProps()}
       className="flex w-full cursor-pointer flex-col items-center justify-center gap-y-4 rounded border-[3px] border-dotted bg-gray-50 p-44 px-4 py-6 font-normal text-gray-500 hover:bg-gray-100"
     >
+      {errorMessage && (
+        <p className="text-center text-destructive">{errorMessage}</p>
+      )}
       <FaCloudArrowUp size={64} />
       <input {...getInputProps()} />
       <div className="w-full text-center">

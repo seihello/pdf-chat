@@ -36,6 +36,7 @@ export default function MainView() {
   const [vectorStore, setVectorStore] = useState<SupabaseVectorStore>();
   const [isPreparingVectors, setIsPreparingVectors] = useState(false);
   const [isGeneratingResponse, setIsGeneratingResponse] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fileInputRef = useRef<HTMLDivElement | null>(null);
   const questionInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -57,17 +58,25 @@ export default function MainView() {
     if (files.length > 0) {
       setIsPreparingVectors(true);
       const sessionId = uuidv4();
-      const fileUrl = await uploadFile(sessionId, files[0]);
-      await storeVectors(sessionId, fileUrl);
-      const vectorStore = new SupabaseVectorStore(embeddings, {
-        client: supabase,
-        tableName: "documents",
-        filter: { session_id: sessionId },
-        queryName: "match_documents",
-      });
+      try {
+        const fileUrl = await uploadFile(sessionId, files[0]);
+        await storeVectors(sessionId, fileUrl);
+        const vectorStore = new SupabaseVectorStore(embeddings, {
+          client: supabase,
+          tableName: "documents",
+          filter: { session_id: sessionId },
+          queryName: "match_documents",
+        });
 
-      setVectorStore(vectorStore);
-      setIsPreparingVectors(false);
+        setVectorStore(vectorStore);
+      } catch (error) {
+        console.error(error);
+        setErrorMessage(
+          "I'm sorry. We can't handle this file. Please try replacing the file.",
+        );
+      } finally {
+        setIsPreparingVectors(false);
+      }
     }
   };
 
@@ -139,6 +148,7 @@ export default function MainView() {
                 files={files}
                 setFiles={setFiles}
                 acceptedFileCount={ACCEPTED_FILE_COUNT}
+                errorMessage={errorMessage}
               />
               <div className="flex justify-center">
                 <Button
