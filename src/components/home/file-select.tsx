@@ -55,7 +55,7 @@ export default function FileSelect({
           *Maximum file size is <b>30MB</b>.
         </p>
         <p>
-          *We only accept a file written in <b>English</b>.
+          *We only accept files written in <b>English</b>.
         </p>
       </div>
       {isFileSelectedOnce && files.length !== acceptedFileCount && (
